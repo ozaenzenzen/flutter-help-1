@@ -3,38 +3,31 @@ import 'package:tailorine_mobilev2/models/availability_model.dart';
 import 'package:tailorine_mobilev2/shared/theme.dart';
 
 class ClockCard extends StatefulWidget {
-  // final AvailabilityModel? availability;
-  // final Function(AvailabilityModel)? onTap;
-
-  // final AvailabilityDateTimeModel? availability;
   final AvailabilityTimeModel? timeData;
-  final Function(AvailabilityTimeModel)? onTap;
-  final bool? isSelected;
+  final int value;
+  final dynamic groupValue;
+  final void Function(AvailabilityTimeModel data, int)? onTap;
 
   ClockCard({
     required this.timeData,
+    required this.value,
+    required this.groupValue,
     required this.onTap,
-    required this.isSelected,
   });
+
   @override
   State<ClockCard> createState() => _ClockCardState();
 }
 
 class _ClockCardState extends State<ClockCard> {
-  // bool isSelected = false;
-
   @override
   Widget build(BuildContext context) {
+    final isSelected = widget.value == widget.groupValue;
     return Scaffold(
       body: GestureDetector(
         onTap: () {
-          if (widget.timeData!.booked!) {
-            //
-          } else {
-            widget.onTap!(widget.timeData!);
-            // setState(() {
-            //   isSelected = !isSelected;
-            // });
+          if (widget.timeData!.booked! == false) {
+            widget.onTap!(widget.timeData!, widget.value);
           }
         },
         child: widget.timeData!.time!.isNotEmpty
@@ -50,7 +43,7 @@ class _ClockCardState extends State<ClockCard> {
                 decoration: BoxDecoration(
                   color: widget.timeData!.booked!
                       ? Colors.grey.shade100
-                      : widget.isSelected!
+                      : isSelected
                           ? primaryColor
                           : bgColor,
                   borderRadius: BorderRadius.circular(10),
@@ -66,7 +59,7 @@ class _ClockCardState extends State<ClockCard> {
                       fontSize: 14,
                       color: widget.timeData!.booked!
                           ? Colors.grey.shade300
-                          : widget.isSelected!
+                          : isSelected
                               ? Colors.white
                               : textColor,
                     ),

@@ -62,6 +62,9 @@ class AppointmentProvider with ChangeNotifier {
   String get message => _message;
 
   void chooseAvailability(DateTime date) {
+    selectedList = [];
+    listAvailabilityTime = [];
+
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);
     debugPrint("data formattedDate: ${formattedDate}");
 
@@ -72,8 +75,6 @@ class AppointmentProvider with ChangeNotifier {
 
     debugPrint("_selectedList ${_selectedList}");
 
-    _listAvailabilityTime = [];
-
     for (final element in _selectedList) {
       for (final element2 in element.time!) {
         _listAvailabilityTime.add(element2);
@@ -82,6 +83,7 @@ class AppointmentProvider with ChangeNotifier {
   }
 
   Future<void> fetchAvailability(String uuid) async {
+    listAvailability.clear();
     _currentState = CurrentState.Loading;
     notifyListeners();
     AvailabilityResponseModel? availabilityResp = await AppointmentService().fetchAvailabilityV2(uuid);

@@ -10,6 +10,7 @@ import '../models/tailor_model.dart';
 import '../provider/auth_provider.dart';
 import '../service/appointment_service.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:collection/collection.dart';
 
 class AppointmentScreen extends StatefulWidget {
   final String uuid;
@@ -32,26 +33,22 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   AuthProvider? authProvider;
   UserModel? user;
 
+  int? _timeCardValue = 0;
+
   @override
   void initState() {
-    // WidgetsBinding.instance!.addPostFrameCallback((_) {
-    //   authProvider = Provider.of<AuthProvider>(context);
-    //   user = authProvider?.user;
-    //   appointmentProvider = Provider.of<AppointmentProvider>(context);
-    // });
-    // WidgetsBinding.instance!.addPostFrameCallback((_) async {
-    //   await appointmentProvider?.fetchAvailability(user!.uuid!);
-    // });
-    // AppointmentProvider().fetchAvailability(widget.uuid);
     Future.microtask(() {
-      // authProvider = Provider.of<AuthProvider>(context);
-      // user = authProvider?.user;
       Provider.of<AppointmentProvider>(
         context,
         listen: false,
       ).fetchAvailability(widget.uuid);
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -435,15 +432,16 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                         crossAxisSpacing: 15,
                       ),
                       children: data.listAvailabilityTime
-                          .map((time) => ClockCard(
+                          .mapIndexed((i, time) => ClockCard(
                                 timeData: time,
-                                isSelected: isSelected,
-                                onTap: (timeData) {
+                                value: i,
+                                groupValue: _timeCardValue!,
+                                onTap: (timeData, value) {
                                   setState(() {
-                                    isSelected = !isSelected;
+                                    // isSelected = !isSelected;
+                                    _timeCardValue = value;
                                   });
-                                  // debugPrint("availability ${timeData.booked}");
-                                  debugPrint("time ${timeData.booked} ${timeData.time}");
+                                  debugPrint("booked: ${timeData.booked}, time: ${timeData.time}");
                                 },
                               ))
                           .toList(),
@@ -518,15 +516,16 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   crossAxisSpacing: 15,
                 ),
                 children: data.listAvailabilityTime
-                    .map((time) => ClockCard(
+                    .mapIndexed((i, time) => ClockCard(
                           timeData: time,
-                          isSelected: isSelected,
-                          onTap: (timeData) {
+                          value: i,
+                          groupValue: _timeCardValue!,
+                          onTap: (timeData, value) {
                             setState(() {
-                              isSelected = !isSelected;
+                              // isSelected = !isSelected;
+                              _timeCardValue = value;
                             });
-                            // debugPrint("availability ${timeData.booked}");
-                            debugPrint("time ${timeData.booked} ${timeData.time}");
+                            debugPrint("booked: ${timeData.booked}, time: ${timeData.time}");
                           },
                         ))
                     .toList(),
