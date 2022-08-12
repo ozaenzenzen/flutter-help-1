@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:tailorine_mobilev2/models/appoinment_req_model.dart';
 import 'package:tailorine_mobilev2/service/store_data_locally.dart';
 
 import '../models/appointment_model.dart';
@@ -12,28 +13,34 @@ import '../models/availability_model.dart';
 class AppointmentService {
   String baseUrl = 'https://glacial-headland-77864.herokuapp.com';
 
-  Future<AppointmentModel> sendAppointment({
-    String? message,
-    String? time,
-    String? date,
-    String? phone_number,
-    String? profile_picture,
-    String? first_name,
-    String? last_name,
+  Future sendAppointment({
+    AppointmentRequestModel? appointmentRequestModel,
   }) async {
-    //  var url = '$baseUrl/customer/register';
+    String getToken = await UserPreference().getToken();
     try {
-      AppointmentModel appointment = await AppointmentModel(
-        message: message,
-        time: time,
-        date: date,
-        phone_number: phone_number,
-        profile_picture: profile_picture,
+      var url = '$baseUrl/customer/register';
+      var headers = {
+        'Content-Type': 'application/json',
+        HttpHeaders.authorizationHeader: "Bearer $getToken",
+      };
+      var response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: appointmentRequestModel?.toJson(),
       );
 
-      return appointment;
+      var jsonData = jsonDecode(response.body);
+      return AppointmentResponseModel.fromJson(jsonData);
     } catch (e) {
-      throw Exception(e);
+      return AppointmentResponseModel.fromJson(
+        {
+          "meta": {
+            'status': 'error',
+            'message': '$e',
+          },
+          // "data": [],
+        },
+      );
     }
   }
 
@@ -62,6 +69,31 @@ class AppointmentService {
       );
     }
   }
+
+  // Future<AppointmentModel> sendAppointment({
+  //   String? message,
+  //   String? time,
+  //   String? date,
+  //   String? phone_number,
+  //   String? profile_picture,
+  //   String? first_name,
+  //   String? last_name,
+  // }) async {
+  //   //  var url = '$baseUrl/customer/register';
+  //   try {
+  //     AppointmentModel appointment = await AppointmentModel(
+  //       message: message,
+  //       time: time,
+  //       date: date,
+  //       phone_number: phone_number,
+  //       profile_picture: profile_picture,
+  //     );
+
+  //     return appointment;
+  //   } catch (e) {
+  //     throw Exception(e);
+  //   }
+  // }
 
   // // fetch availability
   // Future<List<AvailabilityDateTimeModel>> fetchAvailability(String uuid) async {

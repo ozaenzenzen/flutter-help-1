@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:tailorine_mobilev2/models/appoinment_req_model.dart';
 import 'package:tailorine_mobilev2/models/appointment_model.dart';
 import 'package:tailorine_mobilev2/models/availability_model.dart';
 
@@ -9,13 +10,6 @@ import '../service/appointment_service.dart';
 enum CurrentState { Empty, Loading, Success, Error }
 
 class AppointmentProvider with ChangeNotifier {
-  AppointmentModel _appointment = AppointmentModel();
-  AppointmentModel get appointment => _appointment;
-  set appointment(AppointmentModel appointment) {
-    _appointment = appointment;
-    notifyListeners();
-  }
-
   AvailabilityMetaModel _availabilityMetaModel = AvailabilityMetaModel();
   AvailabilityMetaModel get availabilityMetaModel => _availabilityMetaModel;
   set availabilityMetaModel(AvailabilityMetaModel availabilityMetaModel) {
@@ -100,29 +94,68 @@ class AppointmentProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> sendAppointment({
-    String? message,
-    String? time,
-    String? date,
-    String? phone_number,
-    String? profile_picture,
-  }) async {
-    try {
-      AppointmentModel appointment = await AppointmentService().sendAppointment(
-        message: message,
-        time: time,
-        date: date,
-        phone_number: phone_number,
-        profile_picture: profile_picture,
-      );
+  AppointmentMetaModel _appointmentMetaModel = AppointmentMetaModel();
+  AppointmentMetaModel get appointmentMetaModel => _appointmentMetaModel;
+  set appointmentMetaModel(AppointmentMetaModel appointmentMetaModel) {
+    _appointmentMetaModel = appointmentMetaModel;
+    notifyListeners();
+  }
 
-      _appointment = appointment;
-      return true;
-    } catch (e) {
-      print(e);
-      return false;
+  AppointmentResponseModel _appointmentResponseModel = AppointmentResponseModel();
+  AppointmentResponseModel get appointmentResponseModel => _appointmentResponseModel;
+  set appointmentResponseModel(AppointmentResponseModel appointmentResponseModel) {
+    _appointmentResponseModel = appointmentResponseModel;
+    notifyListeners();
+  }
+
+  Future<void> sendAppointment(AppointmentRequestModel? appointmentRequestModel) async {
+    _currentState = CurrentState.Loading;
+    notifyListeners();
+    AppointmentResponseModel? appointmentResp = await AppointmentService().sendAppointment(
+      appointmentRequestModel: appointmentRequestModel!,
+    );
+    if (appointmentResp?.meta?.code == 200) {
+      _currentState = CurrentState.Success;
+      _appointmentResponseModel = appointmentResp!;
+      notifyListeners();
+    } else {
+      _currentState = CurrentState.Error;
+      appointmentMetaModel = appointmentResp!.meta!;
+      notifyListeners();
     }
   }
 }
+
+// AppointmentModel _appointment = AppointmentModel();
+// AppointmentModel get appointment => _appointment;
+// set appointment(AppointmentModel appointment) {
+//   _appointment = appointment;
+//   notifyListeners();
+// }
+
+//   Future<bool> sendAppointment({
+//     String? message,
+//     String? time,
+//     String? date,
+//     String? phone_number,
+//     String? profile_picture,
+//   }) async {
+//     try {
+//       AppointmentModel appointment = await AppointmentService().sendAppointment(
+//         message: message,
+//         time: time,
+//         date: date,
+//         phone_number: phone_number,
+//         profile_picture: profile_picture,
+//       );
+
+//       _appointment = appointment;
+//       return true;
+//     } catch (e) {
+//       print(e);
+//       return false;
+//     }
+//   }
+// }
 
 //   Future
