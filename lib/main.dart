@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tailorine_mobilev2/models/tailor_model.dart';
 import 'package:tailorine_mobilev2/models/user_model.dart';
+import 'package:tailorine_mobilev2/provider/appointment_provider.dart';
 import 'package:tailorine_mobilev2/provider/auth_provider.dart';
 import 'package:tailorine_mobilev2/provider/catalogue_provider.dart';
 import 'package:tailorine_mobilev2/provider/page_provider.dart';
@@ -57,6 +58,9 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider(
           create: (context) => CatalogueProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AppointmentProvider(),
         ),
       ],
       child: MaterialApp(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:tailorine_mobilev2/service/store_data_locally.dart';
 
 import '../models/appointment_model.dart';
@@ -37,33 +38,59 @@ class AppointmentService {
   }
 
   // fetch availability
-  Future<List<AvailabilityModel>> fetchAvailability(String uuid) async {
+  Future fetchAvailabilityV2(String uuid) async {
     String getToken = await UserPreference().getToken();
     try {
       var url = '$baseUrl/availability?tailor=$uuid';
-      var headers = {
-        'Content-Type': 'application/json',
-        HttpHeaders.authorizationHeader: "Bearer $getToken"
-      };
+      var headers = {'Content-Type': 'application/json', HttpHeaders.authorizationHeader: "Bearer $getToken"};
       var response = await http.get(
         Uri.parse(url),
         headers: headers,
       );
 
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body)['data'] as List;
-        List<AvailabilityModel> availability = [];
-        for (var item in data) {
-          availability.add(AvailabilityModel.fromJson(item));
-        }
-        return availability.toList();
-      } else {
-        throw Exception(jsonDecode(response.body)['message']);
-      }
+      var jsonData = jsonDecode(response.body);
+      return AvailabilityResponseModel.fromJson(jsonData);
     } catch (e) {
-      throw Exception(e);
+      return AvailabilityResponseModel.fromJson(
+        {
+          "meta": {
+            'status': 'error',
+            'message': '$e',
+          },
+          // "data": [],
+        },
+      );
     }
   }
+
+  // // fetch availability
+  // Future<List<AvailabilityDateTimeModel>> fetchAvailability(String uuid) async {
+  //   String getToken = await UserPreference().getToken();
+  //   try {
+  //     var url = '$baseUrl/availability?tailor=$uuid';
+  //     var headers = {
+  //       'Content-Type': 'application/json',
+  //       HttpHeaders.authorizationHeader: "Bearer $getToken"
+  //     };
+  //     var response = await http.get(
+  //       Uri.parse(url),
+  //       headers: headers,
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       var data = jsonDecode(response.body)['data'] as List;
+  //       List<AvailabilityDateTimeModel> availability = [];
+  //       for (var item in data) {
+  //         availability.add(AvailabilityDateTimeModel.fromJson(item));
+  //       }
+  //       return availability.toList();
+  //     } else {
+  //       throw Exception(jsonDecode(response.body)['message']);
+  //     }
+  //   } catch (e) {
+  //     throw Exception(e);
+  //   }
+  // }
 
   //fetch availability
 

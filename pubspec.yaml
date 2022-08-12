@@ -47,7 +47,7 @@ dependencies:
   get: any
   flutter_date_pickers: ^0.4.0
   table_calendar: ^3.0.6
-  
+  intl:
   
   
 

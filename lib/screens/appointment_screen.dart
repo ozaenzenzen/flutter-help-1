@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tailorine_mobilev2/models/availability_model.dart';
 import 'package:tailorine_mobilev2/models/user_model.dart';
+import 'package:tailorine_mobilev2/provider/appointment_provider.dart';
 import 'package:tailorine_mobilev2/shared/theme.dart';
 import 'package:flutter_date_pickers/flutter_date_pickers.dart';
 import 'package:tailorine_mobilev2/widget/clock_card.dart';
@@ -27,24 +28,62 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   final kToday = DateTime.now();
+  AppointmentProvider? appointmentProvider;
+  AuthProvider? authProvider;
+  UserModel? user;
+
+  @override
+  void initState() {
+    // WidgetsBinding.instance!.addPostFrameCallback((_) {
+    //   authProvider = Provider.of<AuthProvider>(context);
+    //   user = authProvider?.user;
+    //   appointmentProvider = Provider.of<AppointmentProvider>(context);
+    // });
+    // WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    //   await appointmentProvider?.fetchAvailability(user!.uuid!);
+    // });
+    // AppointmentProvider().fetchAvailability(widget.uuid);
+    Future.microtask(() {
+      // authProvider = Provider.of<AuthProvider>(context);
+      // user = authProvider?.user;
+      Provider.of<AppointmentProvider>(
+        context,
+        listen: false,
+      ).fetchAvailability(widget.uuid);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider authProvider = Provider.of<AuthProvider>(context);
-    UserModel user = authProvider.user;
+    String _tempMessage;
+    String _tempTime;
+    String _tempDate;
 
-    sendAppointment() async {
+    sendAppointment({
+      required String? time,
+      required String? date,
+      String? message,
+    }) async {
       setState(() {
         isLoading = true;
       });
       await AppointmentService().sendAppointment(
-        message: '',
-        time: '',
-        date: '',
-        phone_number: user.phone_number,
-        first_name: user.first_name,
-        last_name: user.last_name,
+        message: message ?? '',
+        time: time,
+        date: date,
+        phone_number: user!.phone_number,
+        first_name: user!.first_name,
+        last_name: user!.last_name,
       );
+      // await AppointmentService().sendAppointment(
+      //   message: '',
+      //   time: '',
+      //   date: '',
+      //   phone_number: user.phone_number,
+      //   first_name: user.first_name,
+      //   last_name: user.last_name,
+      // );
       setState(() {
         isLoading = false;
       });
@@ -127,8 +166,8 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                     height: 18,
                   ),
                   Text(
-                    // '${widget.tailor.first_name} ${widget.tailor.last_name}',
-                    "",
+                    '${widget.tailor.first_name} ${widget.tailor.last_name}',
+                    // "",
                     style: titleTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semibold,
@@ -142,8 +181,8 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   Row(
                     children: [
                       Text(
-                        // widget.tailor.district! + ',',
-                        "widget.tailor.district",
+                        widget.tailor.district! + ',',
+                        // "widget.tailor.district",
                         style: regularTextStyle.copyWith(
                           fontSize: 14,
                         ),
@@ -234,68 +273,124 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                 ),
               ),
             ),
-            FutureBuilder<List<AvailabilityModel>>(
-              future: AppointmentService().fetchAvailability(widget.uuid),
-              builder: (ctx, snap) {
-                // if (snap.hasError) {
-                //   showDialog(
-                //       context: context,
-                //       builder: (context) {
-                //         return AlertDialog(
-                //           title: Text("Error"),
-                //           content: Text("${snap.hasError.toString()}"),
-                //         );
-                //       });
-                // }
-                return TableCalendar(
-                    headerStyle: HeaderStyle(
-                      titleTextStyle: titleTextStyle.copyWith(
-                        fontSize: 14,
-                        fontWeight: medium,
+            Consumer<AppointmentProvider>(
+              builder: (context, data, _) {
+                final state = data.currentState;
+                final AvailabilityMetaModel meta = data.availabilityMetaModel;
+                if (state == CurrentState.Loading) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state == CurrentState.Success) {
+                  return TableCalendar(
+                      headerStyle: HeaderStyle(
+                        titleTextStyle: titleTextStyle.copyWith(
+                          fontSize: 14,
+                          fontWeight: medium,
+                        ),
+                        headerMargin: EdgeInsets.only(top: 10, bottom: 10),
+                        leftChevronMargin: EdgeInsets.only(left: 0),
+                        leftChevronPadding: EdgeInsets.only(left: 0),
+                        rightChevronMargin: EdgeInsets.only(right: 0),
+                        rightChevronPadding: EdgeInsets.only(right: 0),
+                        formatButtonVisible: false,
                       ),
-                      headerMargin: EdgeInsets.only(top: 10, bottom: 10),
-                      leftChevronMargin: EdgeInsets.only(left: 0),
-                      leftChevronPadding: EdgeInsets.only(left: 0),
-                      rightChevronMargin: EdgeInsets.only(right: 0),
-                      rightChevronPadding: EdgeInsets.only(right: 0),
-                      formatButtonVisible: false,
-                    ),
-                    calendarStyle: CalendarStyle(
-                      selectedDecoration: BoxDecoration(
-                        color: primaryColor,
-                        shape: BoxShape.circle,
+                      calendarStyle: CalendarStyle(
+                        selectedDecoration: BoxDecoration(
+                          color: primaryColor,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
-                    firstDay: DateTime.utc(2010, 10, 16),
-                    lastDay: DateTime.utc(2030, 3, 14),
-                    focusedDay: _focusedDay,
-                    calendarFormat: _calendarFormat,
-                    selectedDayPredicate: (day) {
-                      return isSameDay(_selectedDay, day);
-                    },
-                    onDaySelected: (selectedDay, focusedDay) {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
-                    },
-                    //on day selected show time fetched
-                    // onDaySelected: (day, events) {
-                    //   if (_selectedDay ==
-                    //       widget.tailor.availability!.first.date) {
-                    //     setState(() {
-                    //       _selectedDay = day;
-                    //       _focusedDay = day;
-                    //     });
-                    //   } else {}
+                      firstDay: DateTime.utc(2010, 10, 16),
+                      lastDay: DateTime.utc(2030, 3, 14),
+                      focusedDay: _focusedDay,
+                      calendarFormat: _calendarFormat,
+                      selectedDayPredicate: (day) {
+                        return isSameDay(_selectedDay, day);
+                      },
+                      onDaySelected: (selectedDay, focusedDay) {
+                        context.read<AppointmentProvider>().chooseAvailability(selectedDay);
+                        setState(() {
+                          debugPrint("selectedDay ${selectedDay}");
+                          debugPrint("focusedDay ${focusedDay}");
+                          _selectedDay = selectedDay;
+                          _focusedDay = focusedDay;
+                        });
+                      },
+                      //on day selected show time fetched
+                      // onDaySelected: (day, events) {
+                      //   if (_selectedDay ==
+                      //       widget.tailor.availability!.first.date) {
+                      //     setState(() {
+                      //       _selectedDay = day;
+                      //       _focusedDay = day;
+                      //     });
+                      //   } else {}
 
-                    // },
-                    onPageChanged: (focusedDay) {
-                      _focusedDay = focusedDay;
                       // },
-                    });
+                      onPageChanged: (focusedDay) {
+                        _focusedDay = focusedDay;
+                        // },
+                      });
+                } else {
+                  return Text("Failed State // Error // ${meta.message}");
+                }
               },
             ),
+
+            // FutureBuilder<List<AvailabilityModel>>(
+            //   future: AppointmentService().fetchAvailability(widget.uuid),
+            //   builder: (ctx, snap) {
+            //     return TableCalendar(
+            //         headerStyle: HeaderStyle(
+            //           titleTextStyle: titleTextStyle.copyWith(
+            //             fontSize: 14,
+            //             fontWeight: medium,
+            //           ),
+            //           headerMargin: EdgeInsets.only(top: 10, bottom: 10),
+            //           leftChevronMargin: EdgeInsets.only(left: 0),
+            //           leftChevronPadding: EdgeInsets.only(left: 0),
+            //           rightChevronMargin: EdgeInsets.only(right: 0),
+            //           rightChevronPadding: EdgeInsets.only(right: 0),
+            //           formatButtonVisible: false,
+            //         ),
+            //         calendarStyle: CalendarStyle(
+            //           selectedDecoration: BoxDecoration(
+            //             color: primaryColor,
+            //             shape: BoxShape.circle,
+            //           ),
+            //         ),
+            //         firstDay: DateTime.utc(2010, 10, 16),
+            //         lastDay: DateTime.utc(2030, 3, 14),
+            //         focusedDay: _focusedDay,
+            //         calendarFormat: _calendarFormat,
+            //         selectedDayPredicate: (day) {
+            //           return isSameDay(_selectedDay, day);
+            //         },
+            //         onDaySelected: (selectedDay, focusedDay) {
+            //           setState(() {
+            //             debugPrint("selectedDay ${selectedDay}");
+            //             debugPrint("focusedDay ${focusedDay}");
+            //             _selectedDay = selectedDay;
+            //             _focusedDay = focusedDay;
+            //           });
+            //         },
+            //         //on day selected show time fetched
+            //         // onDaySelected: (day, events) {
+            //         //   if (_selectedDay ==
+            //         //       widget.tailor.availability!.first.date) {
+            //         //     setState(() {
+            //         //       _selectedDay = day;
+            //         //       _focusedDay = day;
+            //         //     });
+            //         //   } else {}
+            //         // },
+            //         onPageChanged: (focusedDay) {
+            //           _focusedDay = focusedDay;
+            //           // },
+            //         });
+            //   },
+            // ),
             SizedBox(
               height: 20,
             ),
@@ -319,20 +414,17 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                 right: 24,
               ),
               height: 150,
-              child: FutureBuilder<List<AvailabilityModel>>(
-                future: AppointmentService().fetchAvailability(widget.uuid),
-                builder: (context, snapshot) {
-                  // if (snapshot.hasError) {
-                  //   showDialog(
-                  //       context: context,
-                  //       builder: (context) {
-                  //         return AlertDialog(
-                  //           title: Text("Error"),
-                  //           content: Text("${snapshot.hasError.toString()}"),
-                  //         );
-                  //       });
-                  // }
-                  if (snapshot.hasData) {
+              child: Consumer<AppointmentProvider>(
+                builder: (context, data, child) {
+                  final state = data.currentState;
+                  final AvailabilityMetaModel meta = data.availabilityMetaModel;
+                  debugPrint("current state: ${state}");
+                  // debugPrint("data.listAvailability: ${data.listAvailability}");
+                  if (state == CurrentState.Loading) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (state == CurrentState.Success) {
                     return GridView(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -342,23 +434,56 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                         crossAxisCount: 3,
                         crossAxisSpacing: 15,
                       ),
-                      children: snapshot.data!
-                          .map((availability) => ClockCard(
-                                availability: availability,
-                                onTap: (availability) {
-                                  debugPrint("availability ${availability.date} ${availability.time}");
+                      children: data.listAvailabilityTime
+                          .map((time) => ClockCard(
+                                timeData: time,
+                                isSelected: isSelected,
+                                onTap: (timeData) {
+                                  setState(() {
+                                    isSelected = !isSelected;
+                                  });
+                                  // debugPrint("availability ${timeData.booked}");
+                                  debugPrint("time ${timeData.booked} ${timeData.time}");
                                 },
                               ))
                           .toList(),
                     );
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
+                  } else {
+                    return Text("Failed State // Error // ${meta.message}");
                   }
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
                 },
               ),
+              // child: FutureBuilder<List<AvailabilityDateTimeModel>>(
+              //   future: AppointmentService().fetchAvailability(widget.uuid),
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasData) {
+              //       return GridView(
+              //         physics: NeverScrollableScrollPhysics(),
+              //         shrinkWrap: true,
+              //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              //           mainAxisSpacing: 10,
+              //           mainAxisExtent: 40,
+              //           crossAxisCount: 3,
+              //           crossAxisSpacing: 15,
+              //         ),
+              //         children: snapshot.data!
+              //             .map((availability) => ClockCard(
+              //                   availability: availability,
+              //                   onTap: (availability) {
+              //                     debugPrint("availability ${availability.date}");
+              //                     debugPrint("time ${availability.time![0].booked} ${availability.time![0].time}");
+              //                   },
+              //                 ))
+              //             .toList(),
+              //       );
+              //     } else if (snapshot.hasError) {
+              //       return Text("${snapshot.error}");
+              //     }
+              //     return Center(
+              //       child: CircularProgressIndicator(),
+              //     );
+              //   },
+              // ),
             ),
 
             //grid clock
@@ -374,10 +499,15 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
           right: 24,
         ),
         height: 150,
-        child: FutureBuilder<List<AvailabilityModel>>(
-          future: AppointmentService().fetchAvailability(widget.uuid),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
+        child: Consumer<AppointmentProvider>(
+          builder: (context, data, child) {
+            final state = data.currentState;
+            final AvailabilityMetaModel meta = data.availabilityMetaModel;
+            if (state == CurrentState.Loading) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state == CurrentState.Success) {
               return GridView(
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -387,23 +517,65 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   crossAxisCount: 3,
                   crossAxisSpacing: 15,
                 ),
-                children: snapshot.data!
-                    .map((availability) => ClockCard(
-                          availability: availability,
-                          onTap: (availability) {
-                            debugPrint("availability ${availability.date} ${availability.time}");
+                children: data.listAvailabilityTime
+                    .map((time) => ClockCard(
+                          timeData: time,
+                          isSelected: isSelected,
+                          onTap: (timeData) {
+                            setState(() {
+                              isSelected = !isSelected;
+                            });
+                            // debugPrint("availability ${timeData.booked}");
+                            debugPrint("time ${timeData.booked} ${timeData.time}");
                           },
                         ))
                     .toList(),
+                // children: data.listAvailability
+                //     .map((availability) => ClockCard(
+                //           availability: availability,
+                //           onTap: (availability) {
+                //             debugPrint("availability ${availability.date}");
+                //             debugPrint("time ${availability.time![0].booked} ${availability.time![0].time}");
+                //           },
+                //         ))
+                //     .toList(),
               );
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
+            } else {
+              return Text("Failed State // Error // ${meta.message}");
             }
-            return Center(
-              child: CircularProgressIndicator(),
-            );
           },
         ),
+        // child: FutureBuilder<List<AvailabilityModel>>(
+        //   future: AppointmentService().fetchAvailability(widget.uuid),
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasData) {
+        //       return GridView(
+        //         physics: NeverScrollableScrollPhysics(),
+        //         shrinkWrap: true,
+        //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        //           mainAxisSpacing: 10,
+        //           mainAxisExtent: 40,
+        //           crossAxisCount: 3,
+        //           crossAxisSpacing: 15,
+        //         ),
+        //         children: snapshot.data!
+        //             .map((availability) => ClockCard(
+        //                   availability: availability,
+        //                   onTap: (availability) {
+        //                     debugPrint("availability ${availability.date}");
+        //                     debugPrint("time ${availability.time![0].booked} ${availability.time![0].time}");
+        //                   },
+        //                 ))
+        //             .toList(),
+        //       );
+        //     } else if (snapshot.hasError) {
+        //       return Text("${snapshot.error}");
+        //     }
+        //     return Center(
+        //       child: CircularProgressIndicator(),
+        //     );
+        //   },
+        // ),
       );
     }
 
@@ -459,7 +631,11 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
         width: double.infinity,
         margin: EdgeInsets.only(top: 30, left: 24, right: 24, bottom: 20),
         child: TextButton(
-          onPressed: () {},
+          onPressed: () {
+            // sendAppointment(
+
+            // );
+          },
           style: TextButton.styleFrom(
             backgroundColor: primaryColor,
             shape: RoundedRectangleBorder(
