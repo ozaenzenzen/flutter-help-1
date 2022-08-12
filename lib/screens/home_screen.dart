@@ -68,8 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      // 'Halo, ${user.first_name ?? ''}',
-                      "",
+                      'Halo, ${user.first_name ?? ''}',
                       style: titleTextStyle.copyWith(
                         fontSize: 24,
                         fontWeight: medium,

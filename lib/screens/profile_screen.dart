@@ -119,8 +119,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             InkWell(
               onTap: () {
-                // Navigator.pushNamed(context, '/edit_profile');
-                Navigator.pushNamed(context, '/AppointmentScreen');
+                Navigator.pushNamed(context, '/edit_profile');
+                // Navigator.pushNamed(context, '/AppointmentScreen');
               },
               child: Settings(
                 title: 'Edit Profil',

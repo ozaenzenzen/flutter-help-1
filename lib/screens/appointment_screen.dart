@@ -47,12 +47,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  String? _tempMessage;
+  String _tempMessage = '';
   String? _tempTime;
   String? _tempDate;
 
@@ -508,14 +503,13 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
         child: TextButton(
           onPressed: () {
             AppointmentRequestModel appointmentRequestModel = AppointmentRequestModel(
-              message: _tempMessage!,
+              message: _tempMessage,
               time: _tempTime!,
               date: _tempDate!,
               phone_number: user!.phone_number,
               first_name: user!.first_name,
               last_name: user!.last_name,
             );
-
             Provider.of<AppointmentProvider>(context).sendAppointment(appointmentRequestModel);
           },
           style: TextButton.styleFrom(
