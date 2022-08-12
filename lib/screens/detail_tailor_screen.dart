@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tailorine_mobilev2/provider/appointment_provider.dart';
 
 import 'package:tailorine_mobilev2/provider/tailor_provider.dart';
 import 'package:tailorine_mobilev2/screens/appointment_screen.dart';
@@ -23,7 +25,13 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   void initState() {
     super.initState();
-    TailorProvider().getDetailTailor(widget.uuid);
+    // TailorProvider().getDetailTailor(widget.uuid);
+    Future.microtask(() {
+      Provider.of<TailorProvider>(
+        context,
+        listen: false,
+      ).getDetailTailorV2(widget.uuid);
+    });
   }
 
   @override

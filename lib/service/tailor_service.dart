@@ -1,3 +1,5 @@
+import 'package:tailorine_mobilev2/models/tailor_modelV2.dart';
+
 import '../models/tailor_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -22,6 +24,30 @@ class TailorService {
       return tailors;
     } else {
       throw Exception(jsonDecode(response.body)['message']);
+    }
+  }
+
+  Future<DetailTailorResponseModel> getDetailTailor(String uuid) async {
+    try {
+      var url = '$baseUrl/tailor/$uuid';
+      var headers = {'Content-Type': 'application/json'};
+      var response = await http.get(
+        Uri.parse(url),
+        headers: headers,
+      );
+
+      var jsonData = jsonDecode(response.body);
+      return DetailTailorResponseModel.fromJson(jsonData);
+    } catch (e) {
+      return DetailTailorResponseModel.fromJson(
+        {
+          "meta": {
+            'status': 'error',
+            'message': '$e',
+          },
+          // "data": [],
+        },
+      );
     }
   }
 

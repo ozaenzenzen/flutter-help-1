@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tailorine_mobilev2/screens/appointment_screen.dart';
 import 'package:tailorine_mobilev2/screens/catalogue_screen.dart';
 import 'package:tailorine_mobilev2/widget/review_card.dart';
@@ -22,7 +23,13 @@ class _DetailTailorState extends State<DetailTailor> {
   @override
   void initState() {
     super.initState();
-    TailorProvider().getDetailTailor(widget.uuid);
+    // TailorProvider().getDetailTailor(widget.uuid);
+    Future.microtask(() {
+      Provider.of<TailorProvider>(
+        context,
+        listen: false,
+      ).getDetailTailorV2(widget.uuid);
+    });
   }
 
   @override
@@ -97,8 +104,7 @@ class _DetailTailorState extends State<DetailTailor> {
                 children: [
                   CircleAvatar(
                     radius: 35,
-                    backgroundImage:
-                        NetworkImage(widget.tailor.profile_picture!),
+                    backgroundImage: NetworkImage(widget.tailor.profile_picture!),
                   ),
                   SizedBox(
                     width: 12,
@@ -107,9 +113,7 @@ class _DetailTailorState extends State<DetailTailor> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.tailor.first_name! +
-                            ' ' +
-                            widget.tailor.last_name!,
+                        widget.tailor.first_name! + ' ' + widget.tailor.last_name!,
                         style: regularTextStyle.copyWith(
                           fontSize: 20,
                           fontWeight: semibold,
@@ -215,9 +219,7 @@ class _DetailTailorState extends State<DetailTailor> {
             SizedBox(
               height: 20,
             ),
-            widget.tailor.is_premium!
-                ? AdvatageCard(widget.tailor)
-                : SizedBox(),
+            widget.tailor.is_premium! ? AdvatageCard(widget.tailor) : SizedBox(),
             // NOTE: LOCATION
             Padding(
               padding: EdgeInsets.only(left: 24),
@@ -357,10 +359,7 @@ class _DetailTailorState extends State<DetailTailor> {
                         ),
                         child: Text(
                           'Lihat Katalog',
-                          style: regularTextStyle.copyWith(
-                              fontSize: 14,
-                              fontWeight: bold,
-                              color: primaryColor),
+                          style: regularTextStyle.copyWith(fontSize: 14, fontWeight: bold, color: primaryColor),
                         ),
                         onPressed: () {
                           Navigator.push(
