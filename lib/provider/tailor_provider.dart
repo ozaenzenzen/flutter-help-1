@@ -10,14 +10,14 @@ import 'package:http/http.dart' as http;
 enum CurrentState { Empty, Loading, Success, Error }
 
 class TailorProvider with ChangeNotifier {
-  List<TailorModel> _tailors = [];
+  // List<TailorModel> _tailors = [];
 
-  List<TailorModel> get tailors => _tailors;
+  // List<TailorModel> get tailors => _tailors;
 
-  set products(List<TailorModel> products) {
-    _tailors = tailors;
-    notifyListeners();
-  }
+  // set products(List<TailorModel> products) {
+  //   _tailors = tailors;
+  //   notifyListeners();
+  // }
 
   // Future<void> getAllTailors() async {
   //   try {
@@ -28,66 +28,83 @@ class TailorProvider with ChangeNotifier {
   //   }
   // }
   String baseUrl = 'https://glacial-headland-77864.herokuapp.com';
-  Future<List<TailorModel>> getTailorPremium() async {
-    var url = '$baseUrl/tailor?recommended';
-    var headers = {'Content-Type': 'application/json'};
-    var response = await http.get(
-      Uri.parse(url),
-      headers: headers,
-    );
 
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      List<TailorModel> tailors = [];
-      for (var item in data) {
-        tailors.add(TailorModel.fromJson(item));
-      }
-      return tailors;
+  CurrentState _tailorPremiumState = CurrentState.Empty;
+  CurrentState get tailorPremiumState => _tailorPremiumState;
+  set tailorPremiumState(CurrentState tailorPremiumState) {
+    _tailorPremiumState = tailorPremiumState;
+    notifyListeners();
+  }
+
+  TailorMetaModel _tailorPremiumMetaModel = TailorMetaModel();
+  TailorMetaModel get tailorPremiumMetaModel => _tailorPremiumMetaModel;
+  set tailorPremiumMetaModel(TailorMetaModel tailorPremiumMetaModel) {
+    _tailorPremiumMetaModel = tailorPremiumMetaModel;
+    notifyListeners();
+  }
+
+  TailorResponseModel _tailorPremiumResponseModel = TailorResponseModel();
+  TailorResponseModel get tailorPremiumResponseModel => _tailorPremiumResponseModel;
+  set tailorPremiumResponseModel(TailorResponseModel tailorResponseModelPremium) {
+    _tailorPremiumResponseModel = tailorPremiumResponseModel;
+    notifyListeners();
+  }
+
+  Future<void> getTailorPremiumV2() async {
+    _tailorPremiumState = CurrentState.Loading;
+    notifyListeners();
+    TailorResponseModel tailorPremiumResp = await TailorService().getTailorPremium();
+    if (tailorPremiumResp.meta?.code == 200) {
+      _tailorPremiumState = CurrentState.Success;
+      _tailorPremiumResponseModel = tailorPremiumResp;
+      notifyListeners();
     } else {
-      throw Exception(jsonDecode(response.body)['message']);
+      _tailorPremiumState = CurrentState.Error;
+      _tailorPremiumMetaModel = tailorPremiumResp.meta!;
+      notifyListeners();
     }
   }
 
-  Future<List<TailorModel>> getAllTailor() async {
-    var url = '$baseUrl/tailor';
-    var headers = {'Content-Type': 'application/json'};
-    var response = await http.get(
-      Uri.parse(url),
-      headers: headers,
-    );
+  CurrentState _allTailorState = CurrentState.Empty;
+  CurrentState get allTailorState => _allTailorState;
+  set allTailorState(CurrentState allTailorState) {
+    _allTailorState = allTailorState;
+    notifyListeners();
+  }
 
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      List<TailorModel> tailors = [];
-      for (var item in data) {
-        tailors.add(TailorModel.fromJson(item));
-      }
-      return tailors;
+  TailorMetaModel _allTailorMetaModel = TailorMetaModel();
+  TailorMetaModel get allTailorMetaModel => _allTailorMetaModel;
+  set allTailorMetaModel(TailorMetaModel allTailorMetaModel) {
+    _allTailorMetaModel = allTailorMetaModel;
+    notifyListeners();
+  }
+
+  TailorResponseModel _allTailorResponseModel = TailorResponseModel();
+  TailorResponseModel get allTailorResponseModel => _allTailorResponseModel;
+  set allTailorResponseModel(TailorResponseModel allTailorResponseModel) {
+    _allTailorResponseModel = allTailorResponseModel;
+    notifyListeners();
+  }
+
+  Future<void> getAllTailor() async {
+    _allTailorState = CurrentState.Loading;
+    notifyListeners();
+    TailorResponseModel allTailorResp = await TailorService().getAllTailor();
+    if (allTailorResp.meta?.code == 200) {
+      _allTailorState = CurrentState.Success;
+      _allTailorResponseModel = allTailorResp;
+      notifyListeners();
     } else {
-      throw Exception(jsonDecode(response.body)['message']);
+      _allTailorState = CurrentState.Error;
+      _allTailorMetaModel = allTailorResp.meta!;
+      notifyListeners();
     }
   }
 
-  Future<TailorModel> getDetailTailor(String uuid) async {
-    var url = '$baseUrl/tailor/$uuid';
-    var headers = {'Content-Type': 'application/json'};
-    var response = await http.get(
-      Uri.parse(url),
-      headers: headers,
-    );
-
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      return TailorModel.fromJson(data);
-    } else {
-      throw Exception(jsonDecode(response.body)['message']);
-    }
-  }
-
-  CurrentState _currentState = CurrentState.Empty;
-  CurrentState get currentState => _currentState;
-  set currentState(CurrentState currentState) {
-    _currentState = currentState;
+  CurrentState _detailTailorState = CurrentState.Empty;
+  CurrentState get detailTailorState => _detailTailorState;
+  set detailTailorState(CurrentState currentState) {
+    _detailTailorState = detailTailorState;
     notifyListeners();
   }
 
@@ -106,55 +123,51 @@ class TailorProvider with ChangeNotifier {
   }
 
   Future<void> getDetailTailorV2(String uuid) async {
-    _currentState = CurrentState.Loading;
+    _detailTailorState = CurrentState.Loading;
     notifyListeners();
     DetailTailorResponseModel detailTailorResp = await TailorService().getDetailTailor(uuid);
     if (detailTailorResp.meta?.code == 200) {
-      _currentState = CurrentState.Success;
+      _detailTailorState = CurrentState.Success;
       _detailTailorResponseModel = detailTailorResp;
       notifyListeners();
     } else {
-      _currentState = CurrentState.Error;
+      _detailTailorState = CurrentState.Error;
       _detailTailorMetaModel = detailTailorResp.meta!;
       notifyListeners();
     }
   }
+  
+  TailorResponseModel _tailorNonPremiumResponseModel = TailorResponseModel();
+  TailorResponseModel get tailorNonPremiumResponseModel => _tailorNonPremiumResponseModel;
+  set tailorNonPremiumResponseModel(TailorResponseModel tailorNonPremiumResponseModel) {
+    _tailorNonPremiumResponseModel = tailorNonPremiumResponseModel;
+    notifyListeners();
+  }
+  TailorMetaModel _tailorNonPremiumMetaModel = TailorMetaModel();
+  TailorMetaModel get tailorNonPremiumMetaModel => _tailorNonPremiumMetaModel;
+  set tailorNonPremiumMetaModel(TailorMetaModel tailorNonPremiumMetaModel) {
+    _tailorNonPremiumMetaModel = tailorNonPremiumMetaModel;
+    notifyListeners();
+  }
+  CurrentState _tailorNonPremiumState = CurrentState.Empty;
+  CurrentState get tailorNonPremiumState => _tailorNonPremiumState;
+  set tailorNonPremiumState(CurrentState tailorNonPremiumState) {
+    _tailorNonPremiumState = tailorNonPremiumState;
+    notifyListeners();
+  }
 
-  // Future getTailorsPremium() async {
-  //   try {
-  //     List<TailorModel> tailors = await TailorService().getTailorPremium();
-  //     _tailors = tailors;
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
-  // Future<void> getTailorsnonPremium() async {
-  //   try {
-  //     List<TailorModel> tailors = await TailorService().getTailornonPremium();
-  //     _tailors = tailors;
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
-
-  Future<List<TailorModel>> getTailornonPremium() async {
-    var url = '$baseUrl/tailor?premium=0&sort=rating&order=desc';
-    var headers = {'Content-Type': 'application/json'};
-    var response = await http.get(
-      Uri.parse(url),
-      headers: headers,
-    );
-
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body)['data'];
-      List<TailorModel> tailors = [];
-      for (var item in data) {
-        tailors.add(TailorModel.fromJson(item));
-      }
-      return tailors;
+  Future<void> getTailornonPremiumV2() async {
+    _tailorNonPremiumState = CurrentState.Loading;
+    notifyListeners();
+    TailorResponseModel _tailorRespNonPremium = await TailorService().getTailorPremium();
+    if (_tailorRespNonPremium.meta?.code == 200) {
+      _tailorNonPremiumState = CurrentState.Success;
+      _tailorNonPremiumResponseModel = _tailorRespNonPremium;
+      notifyListeners();
     } else {
-      throw Exception(jsonDecode(response.body)['message']);
+      _tailorNonPremiumState = CurrentState.Error;
+      _tailorNonPremiumMetaModel = _tailorRespNonPremium.meta!;
+      notifyListeners();
     }
   }
 }

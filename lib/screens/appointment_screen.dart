@@ -16,7 +16,7 @@ import 'package:collection/collection.dart';
 
 class AppointmentScreen extends StatefulWidget {
   final String uuid;
-  final TailorModel tailor;
+  final TailorDataModel tailor;
 
   AppointmentScreen(this.uuid, this.tailor);
 
@@ -141,7 +141,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: NetworkImage(widget.tailor.place_picture ?? "https://cdn-images-1.medium.com/max/1200/1*5-aoK8IBmXve5whBQM90GA.png"),
+                  image: NetworkImage(widget.tailor.placePicture ?? "https://cdn-images-1.medium.com/max/1200/1*5-aoK8IBmXve5whBQM90GA.png"),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -154,7 +154,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                     height: 18,
                   ),
                   Text(
-                    '${widget.tailor.first_name} ${widget.tailor.last_name}',
+                    '${widget.tailor.firstName} ${widget.tailor.lastName}',
                     // "",
                     style: titleTextStyle.copyWith(
                       fontSize: 16,
@@ -508,8 +508,8 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   AppointmentRequestModel appointmentRequestModel = AppointmentRequestModel(
                     time: _tempTime,
                     date: _tempDate,
-                    userCustomerId: "", // silakan isi dengan nilai userCustomerId
-                    userTailorId: "", // silakan isi dengan nilai userTailorId
+                    userTailorId: widget.tailor.uuid.toString(),
+                    // userCustomerId: "", // silakan isi dengan nilai userCustomerId
                     // message: pesanController.text,
                   );
                   Provider.of<AppointmentProvider>(

@@ -50,7 +50,10 @@ class AppointmentService {
     String getToken = await UserPreference().getToken();
     try {
       var url = '$baseUrl/availability?tailor=$uuid';
-      var headers = {'Content-Type': 'application/json', HttpHeaders.authorizationHeader: "Bearer $getToken"};
+      var headers = {
+        'Content-Type': 'application/json',
+        HttpHeaders.authorizationHeader: "Bearer $getToken",
+      };
       var response = await http.get(
         Uri.parse(url),
         headers: headers,

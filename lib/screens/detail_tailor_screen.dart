@@ -11,7 +11,7 @@ import '../models/tailor_model.dart';
 import 'catalogue_screen.dart';
 
 class DetailScreen extends StatefulWidget {
-  final TailorModel tailor;
+  final TailorDataModel tailor;
   final String uuid;
   DetailScreen(this.tailor, this.uuid);
 
@@ -43,7 +43,7 @@ class _DetailScreenState extends State<DetailScreen> {
         child: ListView(
           children: [
             Image.network(
-              widget.tailor.place_picture!,
+              widget.tailor.placePicture!,
               width: MediaQuery.of(context).size.width,
               height: 350,
               fit: BoxFit.cover,
@@ -73,7 +73,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         CircleAvatar(
                           radius: 35,
                           backgroundImage:
-                              NetworkImage(widget.tailor.profile_picture!),
+                              NetworkImage(widget.tailor.profilePicture!),
                         ),
                         SizedBox(
                           width: 12,
@@ -82,9 +82,9 @@ class _DetailScreenState extends State<DetailScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.tailor.first_name! +
+                              widget.tailor.firstName! +
                                   ' ' +
-                                  widget.tailor.last_name!,
+                                  widget.tailor.lastName!,
                               style: regularTextStyle.copyWith(
                                 fontSize: 20,
                                 fontWeight: semibold,
@@ -145,7 +145,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 SizedBox(
                                   width: 8,
                                 ),
-                                widget.tailor.is_premium!
+                                widget.tailor.isPremium!
                                     ? Image.asset(
                                         'assets/icons/supertailor.png',
                                         width: 57,
@@ -190,7 +190,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  widget.tailor.is_premium!
+                  widget.tailor.isPremium!
                       ? AdvatageCard(widget.tailor)
                       : SizedBox(),
                   // NOTE: LOCATION

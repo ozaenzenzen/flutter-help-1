@@ -6,7 +6,7 @@ import '../screens/detail_tailor.dart';
 import '../shared/theme.dart';
 
 class RecommendedCard extends StatelessWidget {
-  final TailorModel tailor;
+  final TailorDataModel tailor;
 
   RecommendedCard(this.tailor);
 
@@ -52,7 +52,7 @@ class RecommendedCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 image: DecorationImage(
-                  image: NetworkImage(tailor.place_picture ?? ""),
+                  image: NetworkImage(tailor.placePicture ?? ""),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -65,7 +65,7 @@ class RecommendedCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${tailor.first_name} ${tailor.last_name}',
+                    '${tailor.firstName} ${tailor.lastName}',
                     style: titleTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

@@ -10,7 +10,7 @@ import '../shared/theme.dart';
 import '../widget/advantage_card.dart';
 
 class DetailTailor extends StatefulWidget {
-  final TailorModel tailor;
+  final TailorDataModel tailor;
   final String uuid;
   DetailTailor(this.tailor, this.uuid);
   @override
@@ -40,7 +40,7 @@ class _DetailTailorState extends State<DetailTailor> {
           child: Column(
             children: [
               Image.network(
-                widget.tailor.place_picture!,
+                widget.tailor.placePicture!,
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height / 2,
                 fit: BoxFit.cover,
@@ -104,7 +104,7 @@ class _DetailTailorState extends State<DetailTailor> {
                 children: [
                   CircleAvatar(
                     radius: 35,
-                    backgroundImage: NetworkImage(widget.tailor.profile_picture!),
+                    backgroundImage: NetworkImage(widget.tailor.profilePicture!),
                   ),
                   SizedBox(
                     width: 12,
@@ -113,7 +113,7 @@ class _DetailTailorState extends State<DetailTailor> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.tailor.first_name! + ' ' + widget.tailor.last_name!,
+                        widget.tailor.firstName! + ' ' + widget.tailor.lastName!,
                         style: regularTextStyle.copyWith(
                           fontSize: 20,
                           fontWeight: semibold,
@@ -174,7 +174,7 @@ class _DetailTailorState extends State<DetailTailor> {
                           SizedBox(
                             width: 8,
                           ),
-                          widget.tailor.is_premium!
+                          widget.tailor.isPremium!
                               ? Image.asset(
                                   'assets/icons/supertailor.png',
                                   width: 57,
@@ -219,7 +219,7 @@ class _DetailTailorState extends State<DetailTailor> {
             SizedBox(
               height: 20,
             ),
-            widget.tailor.is_premium! ? AdvatageCard(widget.tailor) : SizedBox(),
+            widget.tailor.isPremium! ? AdvatageCard(widget.tailor) : SizedBox(),
             // NOTE: LOCATION
             Padding(
               padding: EdgeInsets.only(left: 24),

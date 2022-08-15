@@ -29,6 +29,14 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     stickUserData();
     AuthService().getProfile();
+    Future.microtask(() {
+      Provider.of<TailorProvider>(
+        context,
+        listen: false,
+      )
+        ..getTailorPremiumV2()
+        ..getTailornonPremiumV2();
+    });
   }
 
   void stickUserData() async {
@@ -131,8 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: TextField(
               controller: searchController,
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SearchPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
               },
               textAlign: TextAlign.left,
               decoration: InputDecoration(
@@ -142,8 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 hintText: 'Cari penjahit...',
-                hintStyle:
-                    regularTextStyle.copyWith(color: Colors.grey, height: 3.8),
+                hintStyle: regularTextStyle.copyWith(color: Colors.grey, height: 3.8),
                 suffixIcon: Icon(
                   Icons.search,
                   color: primaryColor,
@@ -168,34 +174,39 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   'Rekomendasi',
-                  style: titleTextStyle.copyWith(
-                      fontSize: 24, fontWeight: semibold),
+                  style: titleTextStyle.copyWith(fontSize: 24, fontWeight: semibold),
                 ),
               ],
             ),
           ),
           Container(
             height: 260,
-            child: FutureBuilder<List<TailorModel>>(
-                future: tailorProvider.getTailorPremium(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return ListView(
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      children: snapshot.data!.map(
-                        (tailor) {
-                          return RecommendedCard(
-                            tailor,
-                          );
-                        },
-                      ).toList(),
-                    );
-                  }
+            child: Consumer<TailorProvider>(
+              builder: (context, data, _) {
+                final state = data.tailorPremiumState;
+                final TailorResponseModel dataTailorPremium = data.tailorPremiumResponseModel;
+                final TailorMetaModel meta = data.tailorPremiumMetaModel;
+                if (state == CurrentState.Loading) {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
-                }),
+                } else if (state == CurrentState.Success) {
+                  return ListView(
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    children: dataTailorPremium.data!.map(
+                      (tailor) {
+                        return RecommendedCard(
+                          tailor,
+                        );
+                      },
+                    ).toList(),
+                  );
+                } else {
+                  return Text("Failed State // Error // ${meta.message}");
+                }
+              },
+            ),
           ),
         ],
       );
@@ -219,21 +230,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontWeight: semibold,
               ),
             ),
-            FutureBuilder<List<TailorModel>>(
-              future: tailorProvider.getTailornonPremium(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
+            Consumer<TailorProvider>(
+              builder: (context, data, _) {
+                final state = data.tailorNonPremiumState;
+                final TailorResponseModel dataTailorNonPremium = data.tailorNonPremiumResponseModel;
+                final TailorMetaModel meta = data.tailorNonPremiumMetaModel;
+                if (state == CurrentState.Loading) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state == CurrentState.Success) {
                   return Column(
-                    children: snapshot.data!
-                        .map((tailor) => LainnyaCard(tailor))
+                    children: dataTailorNonPremium.data!
+                        .map(
+                          (tailor) => LainnyaCard(tailor),
+                        )
                         .toList(),
                   );
+                } else {
+                  return Text("Failed State // Error // ${meta.message}");
                 }
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
               },
-            )
+            ),
           ],
         ),
       );

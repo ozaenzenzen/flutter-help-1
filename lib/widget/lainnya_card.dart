@@ -7,7 +7,7 @@ import '../screens/detail_tailor_screen.dart';
 class LainnyaCard extends StatelessWidget {
   // final JobModel job;
 
-  final TailorModel tailor;
+  final TailorDataModel tailor;
   LainnyaCard(this.tailor);
 
   // JobTile(this.job);
@@ -47,7 +47,7 @@ class LainnyaCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: DecorationImage(
-                  image: NetworkImage(tailor.place_picture ?? ""),
+                  image: NetworkImage(tailor.placePicture ?? ""),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -60,7 +60,7 @@ class LainnyaCard extends StatelessWidget {
                     height: 18,
                   ),
                   Text(
-                    '${tailor.first_name} ${tailor.last_name}',
+                    '${tailor.firstName} ${tailor.lastName}',
                     style: titleTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semibold,
@@ -115,7 +115,7 @@ class LainnyaCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(top: 2.5),
                         child: Text(
-                          tailor.rating ?? "",
+                          tailor.rating.toString(),
                           style: regularTextStyle.copyWith(
                               color: secondaryColor,
                               fontWeight: FontWeight.w600),

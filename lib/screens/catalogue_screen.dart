@@ -11,7 +11,7 @@ import '../widget/catalogue_card.dart';
 
 class CatalogueScreen extends StatefulWidget {
   final String uuid;
-  final TailorModel tailor;
+  final TailorDataModel tailor;
 
   CatalogueScreen(this.uuid, this.tailor);
 
@@ -175,14 +175,14 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.tailor.first_name!,
+                      widget.tailor.firstName!,
                       style: titleTextStyle.copyWith(
                           fontSize: 18, fontWeight: semibold),
                     ),
                     SizedBox(
                       height: 4,
                     ),
-                    widget.tailor.is_premium!
+                    widget.tailor.isPremium!
                         ? Image.asset(
                             'assets/icons/supertailor.png',
                             width: 57,
@@ -194,7 +194,7 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
                 CircleAvatar(
                   radius: 25,
                   backgroundColor: primaryColor,
-                  backgroundImage: NetworkImage(widget.tailor.profile_picture!),
+                  backgroundImage: NetworkImage(widget.tailor.profilePicture!),
                 ),
               ],
             ),

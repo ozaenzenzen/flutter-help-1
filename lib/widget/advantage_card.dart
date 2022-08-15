@@ -5,7 +5,7 @@ import '../shared/theme.dart';
 
 // ignore: must_be_immutable
 class AdvatageCard extends StatelessWidget {
-  TailorModel tailor;
+  TailorDataModel tailor;
   AdvatageCard(this.tailor);
 
   @override
@@ -47,7 +47,7 @@ class AdvatageCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 24.0),
                   child: Text(
-                    tailor.first_name! + ' adalah Super Tailor',
+                    tailor.firstName! + ' adalah Super Tailor',
                     style: regularTextStyle.copyWith(
                       fontWeight: semibold,
                     ),
