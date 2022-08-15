@@ -77,7 +77,6 @@ class _MyAppState extends State<MyApp> {
           '/history': (context) => HistoryScreen(),
           '/edit_profile': (context) => DetailEditProfile(),
           '/edit_password': (context) => EditPassword(),
-          // '/AppointmentScreen': (context) => AppointmentScreen("uuid", TailorModel()),
         },
         home: Scaffold(
           body: FutureBuilder(
