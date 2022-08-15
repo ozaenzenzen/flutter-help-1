@@ -55,6 +55,8 @@ class AppointmentProvider with ChangeNotifier {
   String _message = '';
   String get message => _message;
 
+  /// Method untuk mengembalikan list ketersediaan waktu setelah memilih 
+  /// tanggal. 
   void chooseAvailability(DateTime date) {
     selectedList = [];
     listAvailabilityTime = [];
@@ -76,6 +78,7 @@ class AppointmentProvider with ChangeNotifier {
     }
   }
 
+  /// Method untuk memanggil ketersediaan jadwal tanggal dan waktu
   Future<void> fetchAvailability(String uuid) async {
     listAvailability.clear();
     _currentState = CurrentState.Loading;
@@ -108,22 +111,80 @@ class AppointmentProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> sendAppointment(AppointmentRequestModel? appointmentRequestModel) async {
-    _currentState = CurrentState.Loading;
+  CurrentState _sendAppointmentState = CurrentState.Empty;
+  CurrentState get sendAppointmentState => _sendAppointmentState;
+  set sendAppointmentState(CurrentState sendAppointmentState) {
+    _sendAppointmentState = sendAppointmentState;
     notifyListeners();
-    AppointmentResponseModel? appointmentResp = await AppointmentService().sendAppointment(
-      appointmentRequestModel: appointmentRequestModel!,
-    );
-    if (appointmentResp?.meta?.code == 200) {
-      _currentState = CurrentState.Success;
-      _appointmentResponseModel = appointmentResp!;
-      notifyListeners();
-    } else {
-      _currentState = CurrentState.Error;
-      appointmentMetaModel = appointmentResp!.meta!;
+  }
+
+  /// Method untuk mendefinisikan state awal pada [sendAppointmentState]
+  void setDefaultState() {
+    _sendAppointmentState = CurrentState.Empty;
+  }
+
+  /// Method untuk mengirim jadwal appointment
+  ///
+  /// Parameter yang harus diisi adalah [BuildContext] dan 
+  /// kelas [AppointmentRequestModel].
+  /// Context perlu dikirim karena dalam penggunaan State Management Provider, 
+  /// cara paling mudah untuk memanggil dialog adalah dengan memasukkan 
+  /// ke dalam method dalam provider
+  ///  
+  /// Dalam method ini untuk memangil dialog dapat dengan menggunakan
+  /// method [callErrorDialog]
+  Future<void> sendAppointment(
+    BuildContext context, {
+    AppointmentRequestModel? appointmentRequestModel,
+  }) async {
+    _sendAppointmentState = CurrentState.Loading;
+    notifyListeners();
+    try {
+      AppointmentResponseModel? appointmentResp = await AppointmentService().sendAppointment(
+        appointmentRequestModel: appointmentRequestModel!,
+      );
+      if (appointmentResp?.meta?.code == 200) {
+        _sendAppointmentState = CurrentState.Success;
+        _appointmentResponseModel = appointmentResp!;
+        notifyListeners();
+      } else {
+        _sendAppointmentState = CurrentState.Error;
+        appointmentMetaModel = appointmentResp!.meta!;
+        callErrorDialog(context, errorMessage: appointmentMetaModel.message!);
+        notifyListeners();
+      }
+    } catch (e) {
+      _sendAppointmentState = CurrentState.Error;
+      appointmentMetaModel = AppointmentMetaModel(code: 99, message: "$e", status: "error");
+      callErrorDialog(context, errorMessage: appointmentMetaModel.message!);
       notifyListeners();
     }
   }
+}
+
+/// Method untuk memanggil dialog ketika state error. 
+/// Dialog ini dapat dikustomisasi sesuai keinginan.
+Future callErrorDialog(
+  BuildContext context, {
+  required String errorMessage,
+}) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Error"),
+        content: Text("Failed State // Error // ${errorMessage}"),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("Back"),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 // AppointmentModel _appointment = AppointmentModel();

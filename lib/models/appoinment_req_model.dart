@@ -1,39 +1,35 @@
+/// Kelas model untuk mendefinisikan parameter-parameter request ke sendAppointment
+///
+/// Jika parameter tidak sesuai, bisa diganti variabel-variabel di bawah ini.
+/// Dengan menggunakan kelas model, maka akan mengurangi boilerplate pada penulisan kode
 class AppointmentRequestModel {
-  final String? message;
   final String? time;
   final String? date;
-  final String? phone_number;
-  final String? profile_picture;
-  final String? first_name;
-  final String? last_name;
+  final String? userCustomerId;
+  final String? userTailorId;
+  // final String? message;
 
   AppointmentRequestModel({
-    this.message,
     this.time,
     this.date,
-    this.phone_number,
-    this.profile_picture,
-    this.first_name,
-    this.last_name,
+    this.userCustomerId,
+    this.userTailorId,
+    // this.message,
   });
 
   factory AppointmentRequestModel.fromJson(Map<String, dynamic> json) => AppointmentRequestModel(
-        message: json['message'],
         time: json['time'],
         date: json['date'],
-        phone_number: json['phone_number'],
-        profile_picture: json['profile_picture'],
-        first_name: json['first_name'],
-        last_name: json['last_name'],
+        userCustomerId: json['user_customer_id'],
+        userTailorId: json['user_tailor_id'],
+        // message: json['message'],
       );
 
   Map<String, dynamic> toJson() => {
-        "message": message,
         "time": time,
         "date": date,
-        "phone_number": phone_number,
-        "profile_picture": profile_picture,
-        "first_name": first_name,
-        "last_name": last_name,
+        'user_customer_id': userCustomerId,
+        'user_tailor_id': userTailorId,
+        // "message": message,
       };
 }

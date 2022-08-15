@@ -18,7 +18,7 @@ class AppointmentService {
   }) async {
     String getToken = await UserPreference().getToken();
     try {
-      var url = '$baseUrl/customer/register';
+      var url = '$baseUrl/appointment';
       var headers = {
         'Content-Type': 'application/json',
         HttpHeaders.authorizationHeader: "Bearer $getToken",
@@ -26,10 +26,11 @@ class AppointmentService {
       var response = await http.post(
         Uri.parse(url),
         headers: headers,
-        body: appointmentRequestModel?.toJson(),
+        body: jsonEncode(appointmentRequestModel?.toJson()),
       );
 
       var jsonData = jsonDecode(response.body);
+      debugPrint("[AppointmentService][sendAppointment] jsonData $jsonData");
       return AppointmentResponseModel.fromJson(jsonData);
     } catch (e) {
       return AppointmentResponseModel.fromJson(

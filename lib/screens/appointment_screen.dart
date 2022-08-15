@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tailorine_mobilev2/models/appoinment_req_model.dart';
 import 'package:tailorine_mobilev2/models/availability_model.dart';
@@ -34,6 +35,8 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
   AuthProvider? authProvider;
   UserModel? user;
 
+  TextEditingController pesanController = TextEditingController();
+
   int? _timeCardValue = 0;
 
   @override
@@ -42,14 +45,35 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       Provider.of<AppointmentProvider>(
         context,
         listen: false,
-      ).fetchAvailability(widget.uuid);
+      )
+        ..fetchAvailability(widget.uuid)
+        ..setDefaultState();
     });
     super.initState();
   }
 
-  String _tempMessage = '';
-  String? _tempTime;
-  String? _tempDate;
+  String? _tempTime; // variabel temp untuk diisi nilai waktu yang akan dikirim
+  String? _tempDate; // variabel temp untuk diisi nilai date yang akan dikirim
+
+  Future callErrorDialog({required String errorMessage}) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Error"),
+          content: Text("Failed State // Error // ${errorMessage}"),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Back"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -278,7 +302,9 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                           _selectedDay = selectedDay;
                           _focusedDay = focusedDay;
 
-                          _tempDate = selectedDay.toString();
+                          // converter format tanggal menjadi seperti berikut 2022-02-14
+                          String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDay!);
+                          _tempDate = formattedDate.toString();
                         });
                       },
                       onPageChanged: (focusedDay) {
@@ -318,7 +344,6 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                   final state = data.currentState;
                   final AvailabilityMetaModel meta = data.availabilityMetaModel;
                   debugPrint("current state: ${state}");
-                  // debugPrint("data.listAvailability: ${data.listAvailability}");
                   if (state == CurrentState.Loading) {
                     return Center(
                       child: CircularProgressIndicator(),
@@ -372,6 +397,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
           builder: (context, data, child) {
             final state = data.currentState;
             final AvailabilityMetaModel meta = data.availabilityMetaModel;
+            debugPrint("current state: ${state}");
             if (state == CurrentState.Loading) {
               return Center(
                 child: CircularProgressIndicator(),
@@ -393,59 +419,19 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                           groupValue: _timeCardValue!,
                           onTap: (timeData, value) {
                             setState(() {
-                              // isSelected = !isSelected;
                               _timeCardValue = value;
+                              _tempTime = timeData.time.toString();
                             });
                             debugPrint("booked: ${timeData.booked}, time: ${timeData.time}");
                           },
                         ))
                     .toList(),
-                // children: data.listAvailability
-                //     .map((availability) => ClockCard(
-                //           availability: availability,
-                //           onTap: (availability) {
-                //             debugPrint("availability ${availability.date}");
-                //             debugPrint("time ${availability.time![0].booked} ${availability.time![0].time}");
-                //           },
-                //         ))
-                //     .toList(),
               );
             } else {
               return Text("Failed State // Error // ${meta.message}");
             }
           },
         ),
-        // child: FutureBuilder<List<AvailabilityModel>>(
-        //   future: AppointmentService().fetchAvailability(widget.uuid),
-        //   builder: (context, snapshot) {
-        //     if (snapshot.hasData) {
-        //       return GridView(
-        //         physics: NeverScrollableScrollPhysics(),
-        //         shrinkWrap: true,
-        //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        //           mainAxisSpacing: 10,
-        //           mainAxisExtent: 40,
-        //           crossAxisCount: 3,
-        //           crossAxisSpacing: 15,
-        //         ),
-        //         children: snapshot.data!
-        //             .map((availability) => ClockCard(
-        //                   availability: availability,
-        //                   onTap: (availability) {
-        //                     debugPrint("availability ${availability.date}");
-        //                     debugPrint("time ${availability.time![0].booked} ${availability.time![0].time}");
-        //                   },
-        //                 ))
-        //             .toList(),
-        //       );
-        //     } else if (snapshot.hasError) {
-        //       return Text("${snapshot.error}");
-        //     }
-        //     return Center(
-        //       child: CircularProgressIndicator(),
-        //     );
-        //   },
-        // ),
       );
     }
 
@@ -479,6 +465,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                     Expanded(
                       child: TextFormField(
                         style: regularTextStyle,
+                        controller: pesanController,
                         // controller: firstnameController,
                         decoration: InputDecoration.collapsed(
                           hintText: '',
@@ -496,37 +483,65 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
     }
 
     Widget submit() {
-      return Container(
-        height: 50,
-        width: double.infinity,
-        margin: EdgeInsets.only(top: 30, left: 24, right: 24, bottom: 20),
-        child: TextButton(
-          onPressed: () {
-            AppointmentRequestModel appointmentRequestModel = AppointmentRequestModel(
-              message: _tempMessage,
-              time: _tempTime!,
-              date: _tempDate!,
-              phone_number: user!.phone_number,
-              first_name: user!.first_name,
-              last_name: user!.last_name,
+      return Consumer<AppointmentProvider>(
+        builder: (context, data, child) {
+          final state = data.sendAppointmentState;
+          final AvailabilityMetaModel meta = data.availabilityMetaModel;
+          debugPrint("sendAppointment state: $state");
+          if (state == CurrentState.Loading) {
+            return Center(
+              child: CircularProgressIndicator(),
             );
-            Provider.of<AppointmentProvider>(context).sendAppointment(appointmentRequestModel);
-          },
-          style: TextButton.styleFrom(
-            backgroundColor: primaryColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          child: Text(
-            'Buat Janji Temu Sekarang!',
-            style: regularTextStyle.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: bgColor,
-            ),
-          ),
-        ),
+          } else {
+            return Container(
+              height: 50,
+              width: double.infinity,
+              margin: EdgeInsets.only(top: 30, left: 24, right: 24, bottom: 20),
+              child: TextButton(
+                onPressed: () {
+                  // validasi ketika parameter tanggal dan waktu blm dipilih atau masih null
+                  // jika null akan memanggil dialog [callErrorDialog]
+                  if (_tempTime == null || _tempDate == null) {
+                    callErrorDialog(errorMessage: "Silakan pilih tanggal dan waktu");
+                    return;
+                  }
+                  AppointmentRequestModel appointmentRequestModel = AppointmentRequestModel(
+                    time: _tempTime,
+                    date: _tempDate,
+                    userCustomerId: "", // silakan isi dengan nilai userCustomerId
+                    userTailorId: "", // silakan isi dengan nilai userTailorId
+                    // message: pesanController.text,
+                  );
+                  Provider.of<AppointmentProvider>(
+                    context,
+                    listen: false,
+                  ).sendAppointment(
+                    context,
+                    appointmentRequestModel: appointmentRequestModel,
+                  );
+
+                  // mengosongkan nilai variabel temp, setelah hit tombol
+                  _tempTime = null;
+                  _tempDate = null;
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Buat Janji Temu Sekarang!',
+                  style: regularTextStyle.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: bgColor,
+                  ),
+                ),
+              ),
+            );
+          }
+        },
       );
     }
 
