@@ -520,9 +520,9 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                     appointmentRequestModel: appointmentRequestModel,
                   );
 
-                  // mengosongkan nilai variabel temp, setelah hit tombol
-                  _tempTime = null;
-                  _tempDate = null;
+                  // // mengosongkan nilai variabel temp, setelah hit tombol
+                  // _tempTime = null;
+                  // _tempDate = null;
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: primaryColor,
