@@ -94,6 +94,19 @@ class AuthService {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('token', user.token!);
       prefs.setString('uuid', user.uuid!);
+      
+      prefs.setString("first_name", user.first_name!);
+      prefs.setString("last_name", user.last_name!);
+      prefs.setString("profile_picture", user.profile_picture!);
+      
+      prefs.setString("email", user.email!);
+      prefs.setString("address", user.address!);
+      prefs.setString("phone_number", user.phone_number!);
+      prefs.setString("city", user.city!);
+      prefs.setString("district", user.district!);
+      prefs.setString("province", user.province!);
+      prefs.setString("zip_code", user.zip_code!);
+
       print(prefs.getString('uuid'));
       print(prefs.getString('token'));
 
