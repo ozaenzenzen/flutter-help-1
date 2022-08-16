@@ -19,13 +19,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    AuthService().getProfile();
+    // AuthService().getProfile();
+    Future.microtask(() {
+      Provider.of<AuthProvider>(
+        context,
+        listen: false,
+      ).getProfileV2();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider authProvider = Provider.of<AuthProvider>(context);
-    UserModel user = authProvider.user;
+    // AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    // UserModel user = authProvider.user;
 
     void logout() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -64,41 +70,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.only(top: 30.0),
         child: Column(
           children: [
-            // FutureBuilder<UserModel>(
-            //   future: AuthService().getProfile(),
-            //   builder: (ctx, AsyncSnapshot snap) {
-            //     if (snap.hasData) {
-            //       return ClipOval(
-            //         child: Image.network(
-            //           snap.data.profile_picture,
-            //           width: 100,
-            //           height: 100,
-            //           fit: BoxFit.cover,
-            //           errorBuilder: (ctx, error, stackTrace) {
-            //             return Image.asset(
-            //               'assets/logo/logo_app.png',
-            //               width: 50,
-            //               height: 50,
-            //               fit: BoxFit.cover,
-            //             );
-            //           },
-            //         ),
-            //       );
-            //     } else if (snap.hasError) {
-            //       return ClipOval(
-            //         child: Image.asset(
-            //           'assets/logo/logo_app.png',
-            //           width: 100,
-            //           height: 100,
-            //           fit: BoxFit.cover,
-            //         ),
-            //       );
-            //     }
-            //     return Center(
-            //       child: SizedBox(),
-            //     );
-            //   },
-            // ),
+            FutureBuilder<UserModel>(
+              future: AuthService().getProfile(),
+              builder: (ctx, AsyncSnapshot snap) {
+                if (snap.hasData) {
+                  return ClipOval(
+                    child: Image.network(
+                      snap.data.profile_picture,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, error, stackTrace) {
+                        return Image.asset(
+                          'assets/logo/logo_app.png',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
+                  );
+                } else if (snap.hasError) {
+                  return ClipOval(
+                    child: Image.asset(
+                      'assets/logo/logo_app.png',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                }
+                return Center(
+                  child: SizedBox(),
+                );
+              },
+            ),
 
             //update image
 

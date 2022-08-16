@@ -6,6 +6,7 @@ import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tailorine_mobilev2/models/user_modelV2.dart';
 import 'package:tailorine_mobilev2/service/store_data_locally.dart';
 
 import '../models/user_model.dart';
@@ -311,6 +312,37 @@ class AuthService {
     } catch (e) {
       print(e);
       throw Exception(e);
+    }
+  }
+
+  //get profile
+  Future<UserResponseModel> getProfileV2() async {
+    String uuid = await UserPreference().getUuid();
+    String getToken = await UserPreference().getToken();
+     try {
+      var url = '$baseUrl/customer/$uuid';
+      var headers = {
+        'Content-Type': 'application/json',
+        HttpHeaders.authorizationHeader: "Bearer $getToken",
+      };
+      var response = await http.get(
+        Uri.parse(url),
+        headers: headers,
+      );
+
+      var jsonData = jsonDecode(response.body);
+      debugPrint("[AuthService][getProfileV2] jsonData $jsonData");
+      return UserResponseModel.fromJson(jsonData);
+    } catch (e) {
+      return UserResponseModel.fromJson(
+        {
+          "meta": {
+            'status': 'error',
+            'message': '$e',
+          },
+          // "data": [],
+        },
+      );
     }
   }
 }

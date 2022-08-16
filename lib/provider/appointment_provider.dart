@@ -154,11 +154,12 @@ class AppointmentProvider with ChangeNotifier {
         notifyListeners();
       } else {
         _sendAppointmentState = CurrentState.Error;
-        appointmentMetaModel = appointmentResp!.meta!;
+        _appointmentResponseModel = appointmentResp!;
+        _appointmentMetaModel = appointmentResp.meta!;
         callDialog(
           context,
           title: "Error",
-          message: appointmentMetaModel.message!,
+          message: _appointmentResponseModel.data?.message != null ? appointmentResponseModel.data?.message : appointmentMetaModel.message!,
         );
         notifyListeners();
       }
@@ -168,7 +169,7 @@ class AppointmentProvider with ChangeNotifier {
       callDialog(
         context,
         title: "Error",
-        message: appointmentMetaModel.message!,
+        message: e.toString(),
       );
       notifyListeners();
     }
@@ -193,10 +194,11 @@ Future callDialog(
             onPressed: () {
               if (title == "Error") {
                 Navigator.pop(context);
+              } else {
+                Navigator.pop(context);
+                Navigator.pop(context);
+                Navigator.pop(context);
               }
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.pop(context);
             },
             child: Text("Back"),
           ),

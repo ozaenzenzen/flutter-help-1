@@ -11,7 +11,7 @@ class TailorResponseModel {
 
     factory TailorResponseModel.fromJson(Map<String, dynamic> json) => TailorResponseModel(
         meta: TailorMetaModel.fromJson(json["meta"]),
-        data: List<TailorDataModel>.from(json["data"].map((x) => TailorDataModel.fromJson(x))),
+        data: json["data"] != null ? List<TailorDataModel>.from(json["data"].map((x) => TailorDataModel.fromJson(x))) : null,
     );
 
     Map<String, dynamic> toJson() => {

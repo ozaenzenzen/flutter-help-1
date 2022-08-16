@@ -1,85 +1,111 @@
 class AppointmentResponseModel {
-    AppointmentResponseModel({
-        this.meta,
-        this.data,
-    });
+  AppointmentResponseModel({
+    this.meta,
+    this.data,
+  });
 
-    AppointmentMetaModel? meta;
-    AppointmentDataModel? data;
+  AppointmentMetaModel? meta;
+  AppointmentDataModel? data;
 
-    factory AppointmentResponseModel.fromJson(Map<String, dynamic> json) => AppointmentResponseModel(
+  factory AppointmentResponseModel.fromJson(Map<String, dynamic> json) => AppointmentResponseModel(
         meta: AppointmentMetaModel.fromJson(json["meta"]),
-        data: AppointmentDataModel.fromJson(json["data"]),
-    );
+        data: json["data"] != null ? AppointmentDataModel.fromJson(json["data"]) : null,
+      );
 
-    Map<String, dynamic> toJson() => {
-        "meta": meta?.toJson(),
-        "data": data?.toJson(),
-    };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> datameta = new Map<String, dynamic>();
+    datameta["meta"] = meta?.toJson();
+    if (this.data != null) {
+      datameta["data"] = data?.toJson();
+    }
+    return datameta;
+  }
 }
 
 class AppointmentDataModel {
-    AppointmentDataModel({
-        this.userTailorId,
-        this.date,
-        this.time,
-        this.userCustomerId,
-        this.updatedAt,
-        this.createdAt,
-        this.id,
-    });
+  AppointmentDataModel({
+    this.userTailorId,
+    this.date,
+    this.time,
+    this.userCustomerId,
+    this.updatedAt,
+    this.createdAt,
+    this.id,
+    this.message,
+  });
 
-    String? userTailorId;
-    DateTime? date;
-    String? time;
-    String? userCustomerId;
-    DateTime? updatedAt;
-    DateTime? createdAt;
-    int? id;
+  String? userTailorId;
+  DateTime? date;
+  String? time;
+  String? userCustomerId;
+  DateTime? updatedAt;
+  DateTime? createdAt;
+  int? id;
+  dynamic message;
 
-    factory AppointmentDataModel.fromJson(Map<String, dynamic> json) => AppointmentDataModel(
-        userTailorId: json["user_tailor_id"],
-        date: DateTime.parse(json["date"]),
+  factory AppointmentDataModel.fromJson(Map<String, dynamic> json) => AppointmentDataModel(
+        userTailorId: json["user_tailor_id"] != null ? json["user_tailor_id"] : null,
+        date: json["date"] != null ? DateTime.parse(json["date"]) : null,
         time: json["time"],
-        userCustomerId: json["user_customer_id"],
-        updatedAt: DateTime.parse(json["updated_at"]),
-        createdAt: DateTime.parse(json["created_at"]),
-        id: json["id"],
-    );
+        userCustomerId: json["user_customer_id"] != null ? json["user_customer_id"] : null,
+        updatedAt: json["updated_at"] != null ? DateTime.parse(json["updated_at"]) : null,
+        createdAt: json["created_at"] != null ? DateTime.parse(json["created_at"]) : null,
+        id: json["id"] != null ? json["id"] : null,
+        message: json['message'] != null ? json['message'] : null,
+      );
 
-    Map<String, dynamic> toJson() => {
-        "user_tailor_id": userTailorId,
-        "date": "${date!.year.toString().padLeft(4, '0')}-${date!.month.toString().padLeft(2, '0')}-${date!.day.toString().padLeft(2, '0')}",
-        "time": time,
-        "user_customer_id": userCustomerId,
-        "updated_at": updatedAt?.toIso8601String(),
-        "created_at": createdAt?.toIso8601String(),
-        "id": id,
-    };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> datameta = new Map<String, dynamic>();
+    if (this.userTailorId != null) {
+      datameta["user_tailor_id"] = userTailorId;
+    }
+    if (this.date != null) {
+      datameta["date"] = "${date!.year.toString().padLeft(4, '0')}-${date!.month.toString().padLeft(2, '0')}-${date!.day.toString().padLeft(2, '0')}";
+    }
+    if (this.time != null) {
+      datameta["time"] = time;
+    }
+    if (this.userCustomerId != null) {
+      datameta["user_customer_id"] = userCustomerId;
+    }
+    if (this.updatedAt != null) {
+      datameta["updated_at"] = updatedAt?.toIso8601String();
+    }
+    if (this.createdAt != null) {
+      datameta["created_at"] = createdAt?.toIso8601String();
+    }
+    if (this.id != null) {
+      datameta["id"] = id;
+    }
+    if (this.message != null) {
+      datameta["message"] = message;
+    }
+    return datameta;
+  }
 }
 
 class AppointmentMetaModel {
-    AppointmentMetaModel({
-        this.code,
-        this.status,
-        this.message,
-    });
+  AppointmentMetaModel({
+    this.code,
+    this.status,
+    this.message,
+  });
 
-    int? code;
-    String? status;
-    String? message;
+  int? code;
+  String? status;
+  String? message;
 
-    factory AppointmentMetaModel.fromJson(Map<String, dynamic> json) => AppointmentMetaModel(
+  factory AppointmentMetaModel.fromJson(Map<String, dynamic> json) => AppointmentMetaModel(
         code: json["code"],
         status: json["status"],
         message: json["message"],
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "code": code,
         "status": status,
         "message": message,
-    };
+      };
 }
 
 // class AppointmentResponseModel {

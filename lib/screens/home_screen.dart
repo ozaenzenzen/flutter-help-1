@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tailorine_mobilev2/models/tailor_model.dart';
+import 'package:tailorine_mobilev2/models/user_modelV2.dart';
 import 'package:tailorine_mobilev2/provider/tailor_provider.dart';
 import 'package:tailorine_mobilev2/screens/search_page.dart';
 import 'package:tailorine_mobilev2/shared/theme.dart';
@@ -28,8 +29,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     stickUserData();
-    AuthService().getProfile();
+    // AuthService().getProfile();
     Future.microtask(() {
+      Provider.of<AuthProvider>(
+        context,
+        listen: false,
+      ).getProfileV2();
       Provider.of<TailorProvider>(
         context,
         listen: false,
@@ -41,24 +46,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void stickUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var first_name = prefs.getString('first_name');
-    var email = prefs.getString('email');
-    var last_name = prefs.getString('last_name');
-    var profile_picture = prefs.getString('profile_picture');
-    if (first_name != null && last_name != null && profile_picture != null) {
-      Provider.of<AuthProvider>(context, listen: false).user = UserModel(
-        first_name: first_name,
-        profile_picture: profile_picture,
-        last_name: last_name,
-      );
-    }
+  //   var first_name = prefs.getString('first_name');
+  //   var email = prefs.getString('email');
+  //   var last_name = prefs.getString('last_name');
+  //   var profile_picture = prefs.getString('profile_picture');
+  //   if (first_name != null && last_name != null && profile_picture != null) {
+  //     Provider.of<AuthProvider>(context, listen: false).user = UserModel(
+  //       first_name: first_name,
+  //       profile_picture: profile_picture,
+  //       last_name: last_name,
+  //     );
+  //   }
   }
 
   @override
   Widget build(BuildContext context) {
-    TailorProvider tailorProvider = Provider.of<TailorProvider>(context);
-    AuthProvider authProvider = Provider.of<AuthProvider>(context);
-    UserModel user = authProvider.user;
+    // TailorProvider tailorProvider = Provider.of<TailorProvider>(context);
+    // AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    // UserModel user = authProvider.user;
 
     Widget header(BuildContext context) {
       return Container(
@@ -75,13 +80,35 @@ class _HomeScreenState extends State<HomeScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Halo, ${user.first_name ?? ''}',
-                      style: titleTextStyle.copyWith(
-                        fontSize: 24,
-                        fontWeight: medium,
-                      ),
+                    Consumer<AuthProvider>(
+                      builder: (context, data, _) {
+                        final state = data.userProfileState;
+                        final UserResponseModel dataProfile = data.userResponseModel;
+                        final UserMetaModel meta = data.userMetaModel;
+                        if (state == AuthState.Loading) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (state == AuthState.Success) {
+                          return Text(
+                            'Halo, ${dataProfile.data?.profile?.firstName ?? ''}',
+                            style: titleTextStyle.copyWith(
+                              fontSize: 24,
+                              fontWeight: medium,
+                            ),
+                          );
+                        } else {
+                          return Text("Failed State // Error // ${meta.message}");
+                        }
+                      },
                     ),
+                    // Text(
+                    //   'Halo, ${user.first_name ?? ''}',
+                    //   style: titleTextStyle.copyWith(
+                    //     fontSize: 24,
+                    //     fontWeight: medium,
+                    //   ),
+                    // ),
                   ],
                 ),
                 // FutureBuilder<UserModel>(

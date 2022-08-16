@@ -30,7 +30,10 @@ class AppointmentService {
       );
 
       var jsonData = jsonDecode(response.body);
-      debugPrint("[AppointmentService][sendAppointment] jsonData $jsonData");
+      if (response.statusCode == 200) {
+        debugPrint("[AppointmentService][sendAppointment] jsonData $jsonData");
+        return AppointmentResponseModel.fromJson(jsonData);
+      }
       return AppointmentResponseModel.fromJson(jsonData);
     } catch (e) {
       return AppointmentResponseModel.fromJson(

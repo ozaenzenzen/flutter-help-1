@@ -1,85 +1,89 @@
 class AvailabilityResponseModel {
-    AvailabilityResponseModel({
-        this.meta,
-        this.data,
-    });
+  AvailabilityResponseModel({
+    this.meta,
+    this.data,
+  });
 
-    AvailabilityMetaModel? meta;
-    List<AvailabilityDateTimeModel>? data;
+  AvailabilityMetaModel? meta;
+  List<AvailabilityDateTimeModel>? data;
 
-    factory AvailabilityResponseModel.fromJson(Map<String, dynamic> json) => AvailabilityResponseModel(
+  factory AvailabilityResponseModel.fromJson(Map<String, dynamic> json) => AvailabilityResponseModel(
         meta: AvailabilityMetaModel.fromJson(json["meta"]),
-        data: List<AvailabilityDateTimeModel>.from(json["data"].map((x) => AvailabilityDateTimeModel.fromJson(x))),
-    );
+        data: json["data"] != null ? List<AvailabilityDateTimeModel>.from(json["data"].map((x) => AvailabilityDateTimeModel.fromJson(x))) : null,
+      );
 
-    Map<String, dynamic> toJson() => {
-        "meta": meta?.toJson(),
-        "data": List<dynamic>.from(data!.map((x) => x.toJson())),
-    };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> datameta = new Map<String, dynamic>();
+    datameta["meta"] = meta?.toJson();
+    if (this.data != null) {
+      datameta["data"] = List<dynamic>.from(data!.map((x) => x.toJson()));
+    }
+    return datameta;
+  }
 }
 
 class AvailabilityMetaModel {
-    AvailabilityMetaModel({
-        this.code,
-        this.status,
-        this.message,
-    });
+  AvailabilityMetaModel({
+    this.code,
+    this.status,
+    this.message,
+  });
 
-    int? code;
-    String? status;
-    String? message;
+  int? code;
+  String? status;
+  String? message;
 
-    factory AvailabilityMetaModel.fromJson(Map<String, dynamic> json) => AvailabilityMetaModel(
+  factory AvailabilityMetaModel.fromJson(Map<String, dynamic> json) => AvailabilityMetaModel(
         code: json["code"],
         status: json["status"],
         message: json["message"],
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "code": code,
         "status": status,
         "message": message,
-    };
+      };
 }
 
 class AvailabilityDateTimeModel {
-    AvailabilityDateTimeModel({
-        this.date,
-        this.time,
-    });
+  AvailabilityDateTimeModel({
+    this.date,
+    this.time,
+  });
 
-    DateTime? date;
-    List<AvailabilityTimeModel>? time;
+  DateTime? date;
+  List<AvailabilityTimeModel>? time;
 
-    factory AvailabilityDateTimeModel.fromJson(Map<String, dynamic> json) => AvailabilityDateTimeModel(
+  factory AvailabilityDateTimeModel.fromJson(Map<String, dynamic> json) => AvailabilityDateTimeModel(
         date: DateTime.parse(json["date"]),
         time: List<AvailabilityTimeModel>.from(json["time"].map((x) => AvailabilityTimeModel.fromJson(x))),
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "date": "${date!.year.toString().padLeft(4, '0')}-${date!.month.toString().padLeft(2, '0')}-${date!.day.toString().padLeft(2, '0')}",
         "time": List<dynamic>.from(time!.map((x) => x.toJson())),
-    };
+      };
 }
 
 class AvailabilityTimeModel {
-    AvailabilityTimeModel({
-        this.time,
-        this.booked,
-    });
+  AvailabilityTimeModel({
+    this.time,
+    this.booked,
+  });
 
-    String? time;
-    bool? booked;
+  String? time;
+  bool? booked;
 
-    factory AvailabilityTimeModel.fromJson(Map<String, dynamic> json) => AvailabilityTimeModel(
+  factory AvailabilityTimeModel.fromJson(Map<String, dynamic> json) => AvailabilityTimeModel(
         time: json["time"],
         booked: json["booked"],
-    );
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "time": time,
         "booked": booked,
-    };
+      };
 }
 
 

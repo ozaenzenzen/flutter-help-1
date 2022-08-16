@@ -343,7 +343,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                 builder: (context, data, child) {
                   final state = data.currentState;
                   final AvailabilityMetaModel meta = data.availabilityMetaModel;
-                  debugPrint("current state: ${state}");
+                  debugPrint("availability state: ${state}");
                   if (state == CurrentState.Loading) {
                     return Center(
                       child: CircularProgressIndicator(),

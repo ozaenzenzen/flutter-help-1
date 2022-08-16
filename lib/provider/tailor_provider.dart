@@ -89,14 +89,21 @@ class TailorProvider with ChangeNotifier {
   Future<void> getAllTailor() async {
     _allTailorState = CurrentState.Loading;
     notifyListeners();
-    TailorResponseModel allTailorResp = await TailorService().getAllTailor();
-    if (allTailorResp.meta?.code == 200) {
-      _allTailorState = CurrentState.Success;
-      _allTailorResponseModel = allTailorResp;
-      notifyListeners();
-    } else {
+    try {
+      TailorResponseModel allTailorResp = await TailorService().getAllTailor();
+      if (allTailorResp.meta?.code == 200) {
+        _allTailorState = CurrentState.Success;
+        _allTailorResponseModel = allTailorResp;
+        notifyListeners();
+      } else {
+        _allTailorState = CurrentState.Error;
+        _allTailorMetaModel = allTailorResp.meta!;
+        notifyListeners();
+      }
+    } catch (e) {
       _allTailorState = CurrentState.Error;
-      _allTailorMetaModel = allTailorResp.meta!;
+      _allTailorMetaModel = TailorMetaModel(code: 99, message: "$e", status: "error");
+
       notifyListeners();
     }
   }
@@ -125,30 +132,39 @@ class TailorProvider with ChangeNotifier {
   Future<void> getDetailTailorV2(String uuid) async {
     _detailTailorState = CurrentState.Loading;
     notifyListeners();
-    DetailTailorResponseModel detailTailorResp = await TailorService().getDetailTailor(uuid);
-    if (detailTailorResp.meta?.code == 200) {
-      _detailTailorState = CurrentState.Success;
-      _detailTailorResponseModel = detailTailorResp;
-      notifyListeners();
-    } else {
-      _detailTailorState = CurrentState.Error;
-      _detailTailorMetaModel = detailTailorResp.meta!;
+    try {
+      DetailTailorResponseModel detailTailorResp = await TailorService().getDetailTailor(uuid);
+      if (detailTailorResp.meta?.code == 200) {
+        _detailTailorState = CurrentState.Success;
+        _detailTailorResponseModel = detailTailorResp;
+        notifyListeners();
+      } else {
+        _detailTailorState = CurrentState.Error;
+        _detailTailorMetaModel = detailTailorResp.meta!;
+        notifyListeners();
+      }
+    } catch (e) {
+      _tailorPremiumState = CurrentState.Error;
+      _tailorPremiumMetaModel = TailorMetaModel(code: 99, message: "$e", status: "error");
+
       notifyListeners();
     }
   }
-  
+
   TailorResponseModel _tailorNonPremiumResponseModel = TailorResponseModel();
   TailorResponseModel get tailorNonPremiumResponseModel => _tailorNonPremiumResponseModel;
   set tailorNonPremiumResponseModel(TailorResponseModel tailorNonPremiumResponseModel) {
     _tailorNonPremiumResponseModel = tailorNonPremiumResponseModel;
     notifyListeners();
   }
+
   TailorMetaModel _tailorNonPremiumMetaModel = TailorMetaModel();
   TailorMetaModel get tailorNonPremiumMetaModel => _tailorNonPremiumMetaModel;
   set tailorNonPremiumMetaModel(TailorMetaModel tailorNonPremiumMetaModel) {
     _tailorNonPremiumMetaModel = tailorNonPremiumMetaModel;
     notifyListeners();
   }
+
   CurrentState _tailorNonPremiumState = CurrentState.Empty;
   CurrentState get tailorNonPremiumState => _tailorNonPremiumState;
   set tailorNonPremiumState(CurrentState tailorNonPremiumState) {
@@ -159,14 +175,21 @@ class TailorProvider with ChangeNotifier {
   Future<void> getTailornonPremiumV2() async {
     _tailorNonPremiumState = CurrentState.Loading;
     notifyListeners();
-    TailorResponseModel _tailorRespNonPremium = await TailorService().getTailorPremium();
-    if (_tailorRespNonPremium.meta?.code == 200) {
-      _tailorNonPremiumState = CurrentState.Success;
-      _tailorNonPremiumResponseModel = _tailorRespNonPremium;
-      notifyListeners();
-    } else {
+    try {
+      TailorResponseModel _tailorRespNonPremium = await TailorService().getTailornonPremium();
+      if (_tailorRespNonPremium.meta?.code == 200) {
+        _tailorNonPremiumState = CurrentState.Success;
+        _tailorNonPremiumResponseModel = _tailorRespNonPremium;
+        notifyListeners();
+      } else {
+        _tailorNonPremiumState = CurrentState.Error;
+        _tailorNonPremiumMetaModel = _tailorRespNonPremium.meta!;
+        notifyListeners();
+      }
+    } catch (e) {
       _tailorNonPremiumState = CurrentState.Error;
-      _tailorNonPremiumMetaModel = _tailorRespNonPremium.meta!;
+      _tailorNonPremiumMetaModel = TailorMetaModel(code: 99, message: "$e", status: "error");
+
       notifyListeners();
     }
   }

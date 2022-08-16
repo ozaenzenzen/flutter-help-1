@@ -81,7 +81,7 @@ class TailorService {
 
   Future<TailorResponseModel> getTailornonPremium() async {
     try {
-      var url = '$baseUrl/tailor?premium=0&sort=rating&order=desc';
+      var url = '$baseUrl/tailor?premium=0&order=desc';
       var headers = {'Content-Type': 'application/json'};
       var response = await http.get(
         Uri.parse(url),

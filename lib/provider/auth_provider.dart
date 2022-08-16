@@ -1,10 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:tailorine_mobilev2/models/user_modelV2.dart';
 import 'package:tailorine_mobilev2/screens/settings/detail_edit_password.dart';
 import 'package:tailorine_mobilev2/service/store_data_locally.dart';
+import 'package:tailorine_mobilev2/service/tailor_service.dart';
 import '../models/user_model.dart';
 import '../service/auth_service.dart';
+
+enum AuthState { Empty, Loading, Success, Error }
 
 class AuthProvider with ChangeNotifier {
   UserModel _user = UserModel(
@@ -178,6 +182,39 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  //send appointment
+  AuthState _userProfileState = AuthState.Empty;
+  AuthState get userProfileState => _userProfileState;
+  set userProfileState(AuthState userProfileState) {
+    _userProfileState = userProfileState;
+    notifyListeners();
+  }
 
+  UserMetaModel _userMetaModel = UserMetaModel();
+  UserMetaModel get userMetaModel => _userMetaModel;
+  set userMetaModel(UserMetaModel userMetaModel) {
+    _userMetaModel = userMetaModel;
+    notifyListeners();
+  }
+
+  UserResponseModel _userResponseModel = UserResponseModel();
+  UserResponseModel get userResponseModel => _userResponseModel;
+  set userResponseModel(UserResponseModel userResponseModel) {
+    _userResponseModel = userResponseModel;
+    notifyListeners();
+  }
+
+  Future<void> getProfileV2() async {
+    _userProfileState = AuthState.Loading;
+    notifyListeners();
+    UserResponseModel _getProfileResp = await AuthService().getProfileV2();
+    if (_getProfileResp.meta?.code == 200) {
+      _userProfileState = AuthState.Success;
+      _userResponseModel = _getProfileResp;
+      notifyListeners();
+    } else {
+      _userProfileState = AuthState.Error;
+      _userMetaModel = _getProfileResp.meta!;
+      notifyListeners();
+    }
+  }
 }
