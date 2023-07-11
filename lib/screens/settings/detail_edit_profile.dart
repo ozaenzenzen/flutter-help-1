@@ -361,7 +361,7 @@ class _DetailEditProfileState extends State<DetailEditProfile> {
                         style: regularTextStyle,
                         controller: firstnameController,
                         decoration: InputDecoration.collapsed(
-                          hintText: user.first_name!,
+                          hintText: user.first_name ?? '',
                           hintStyle: regularTextStyle.copyWith(
                               fontSize: 14, color: Colors.grey),
                         ),
